@@ -1,0 +1,15 @@
+<tr class="host-item">
+    <td>
+        <input class="enable" type="checkbox"
+            <%= obj.enable ? ' checked="checked" ' : '' %>/>
+    </td>
+    <td>
+        <input class="ip" type="text" value="<%= obj.ip || '' %>" />
+    </td>
+    <td>
+        <input class="host" type="text" value="<%= obj.host || '' %>" />
+    </td>
+    <td>
+        <button class="ui-button delete-row" type="button">Delete</button>
+    </td>
+</tr>

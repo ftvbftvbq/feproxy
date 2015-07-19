@@ -1,0 +1,95 @@
+html,body, span, div, p, td,a,ul,li,img,dd,dl,dt,form{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+summary,details,header,section,footer,hgroup,nav,mark,embed,datalist,article,canvas,time{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+h1,h2,h3,h4,h5{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+input {
+    margin: 0;
+    padding: 0;
+}
+
+iframe {
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+body {
+    line-height: 1.5;
+    padding-bottom: 1px;
+    position: relative;
+}
+
+textarea, input, select, body, button {
+    font-size: 12px;
+    font-family: "Microsoft Yahei",Helvetica,Arial;
+}
+
+input[type=checkbox] {
+    cursor: pointer;
+}
+select {
+    cursor: pointer;
+}
+button {
+    cursor: pointer;
+    line-height: 1.1;
+}
+
+h1 {
+    font-size: 1.8em;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.3em;
+}
+
+h4 {
+    font-size: 1.2em;
+}
+
+h5 {
+    font-size: 1.1em;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: block;
+    clear: both;
+    height: 0;
+    visibility: hidden;
+}
+
+.none, .hide {
+    display: none;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    border: 1px solid #ccc;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    border-color: #3aa7ff;
+    outline: 0;
+}

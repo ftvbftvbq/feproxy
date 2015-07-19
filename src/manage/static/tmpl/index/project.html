@@ -1,0 +1,58 @@
+<div class="project-item <%= obj.isNew ? '' : 'folded' %>">
+    <div class="project-header">
+        <i class="project-fold-toggle"></i>
+        <input class="project-enable" type="checkbox" 
+            <%= obj.enable ? ' checked="checked" ' : '' %>/>
+        <input class="project-name" type="text" 
+            value="<%= obj.name || '' %>" />
+    </div>
+    <div class="project-action">
+        <button class="ui-button delete-project" type="button">Delete</button>
+    </div>
+    <div class="project-setting">
+        <div class="tab-anchor-list">
+            <div class="tab-anchor active" data-tab="rule">Rule</div>
+            <div class="tab-anchor" data-tab="host">Host</div>
+            <div class="tab-anchor" data-tab="advance">Advance</div>
+        </div>
+        <div class="tab-list">
+            <div class="tab active" data-tab="rule">
+                <table class="rule-table" width="100%">
+                    <tr>
+                        <th width="40">Enable</th>
+                        <th>Match</th>
+                        <th>Target</th>
+                        <th width="100">
+                            <button class="ui-button add-rule" type="button">Add</button>
+                        </th>
+                    </tr>
+                </table>
+            </div>
+            <div class="tab" data-tab="host">
+                <table class="host-table" width="100%">
+                    <tr>
+                        <th width="40">Enable</th>
+                        <th>IP</th>
+                        <th>Host</th>
+                        <th width="100">
+                            <button class="ui-button add-host" type="button">Add</button>
+                        </th>
+                    </tr>
+                </table>
+            </div>
+            <div class="tab" data-tab="advance">
+                <table class="advance-table" width="100%">
+                    <tr>
+                        <th width="40">Enable</th>
+                        <th>Match</th>
+                        <th>Target</th>
+                        <th>IP</th>
+                        <th width="100">
+                            <button class="ui-button add-advance" type="button">Add</button>
+                        </th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

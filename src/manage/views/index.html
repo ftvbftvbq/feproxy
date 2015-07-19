@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Anyproxy</title>
+    <link rel="stylesheet" href="/static/css/common.css" />
+    <link rel="stylesheet" href="/static/css/index.css" />
+    <script src="/static/js/lib/jquery-1.11.3.min.js"></script>
+    <script src="/static/js/lib/jquery.base64.js"></script>
+    <script src="/static/js/lib/underscore-min.js"></script>
+    <script>
+        var $$ = {};
+        $$.settings = <%- JSON.stringify(settings) %>;
+    </script>
+    <script src="/static/tmpl/_index.js"></script>
+</head>
+<body>
+    <div id="header" class="container">
+        <h2>AnyProxy</h2>
+        <div class="right">
+            <a href="inspect">inspect</a>
+        </div>
+    </div>
+    <div id="project" class="container">
+        <h2>Projects</h2>
+        <div class="project-sidebar">
+            <button class="ui-button add-project" type="button">Add</button>
+        </div>
+        <div class="project-list" id="project-list"></div>
+        <h2>Proxy</h2>
+        <div class="proxy-setting">
+            <input id="proxy-enable" type="checkbox" />
+            <select id="proxy-type" name="">
+                <option value="">无</option>
+                <option value="pac">pac</option>
+            </select>
+            <span class="proxy-pac">
+                <input type="input" id="proxy-pac-val" value="" />
+                <input type="file" id="proxy-pac-file"/>
+            </span>
+        </div>
+        <div class="control">
+            <span class="save-hint"></span>
+            <button class="ui-button wide important save-setting" type="button">Save</button>
+        </div>
+    </div>
+    <script src="/static/js/index.js"></script>
+</body>
+</html>

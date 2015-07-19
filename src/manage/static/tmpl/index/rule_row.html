@@ -1,0 +1,17 @@
+<tr class="rule-item">
+    <td>
+        <input class="enable" type="checkbox"
+            <%= obj.enable ? ' checked="checked" ' : '' %>/>
+    </td>
+    <td>
+        <input class="match" type="text" 
+            value="<%= obj.match || '' %>" />
+    </td>
+    <td>
+        <input class="target" type="text" 
+            value="<%= obj.target || '' %>" />
+    </td>
+    <td>
+        <button class="ui-button delete-row" type="button">Delete</button>
+    </td>
+</tr>

@@ -1,7 +1,6 @@
 var EventEmitter = require('events').EventEmitter
-var Transform = require('stream').Transform;
 var _ = require('underscore');
-var inspect = require('../../inspect/inspect');
+var networkInspect = require('../../inspect/network');
 var utils = require('../../utils');
 
 function AbstractHandler(req, res) {
@@ -16,7 +15,7 @@ function AbstractHandler(req, res) {
     this.get();
     // chrome inspect
     if (this.inpectable !== false) {
-        this.inspect = inspect.createInpectRequest(req);
+        networkInspect.onSend(req);
     }
 }
 
@@ -40,41 +39,43 @@ var statusCodeMap = {
  * common response
  */
 proto.response = function(msg) {
-    var newMsg;
-    if (msg.readable) {
-        newMsg = new Transform();
-        newMsg._transform = function(chunk, charset, done) {
-            done(null, chunk);
-        };
-        msg.pipe(newMsg);
-    } else {
-        newMsg = {};
-    }
-
     var statusCode = msg.statusCode || 200;
-    var statusMessage = msg.statusMessage || statusCodeMap[statusCode];
-    _.extend(newMsg, {
-        statusCode: statusCode,
-        statusMessage: statusMessage,
-        headers: getResponseHeaders(msg.headers),
-        ext: getResponseExt(msg.headers)
-    });
+    var statusMessage = msg.statusMessage || statusCodeMap[msg.statusCode];
+    var headers = getResponseHeaders(msg.headers);
+    var ext = getResponseExt(msg.headers);
 
-    this._response(newMsg);
-};
-
-proto._response = function(msg) {
     var res = this.res;
-    // write head
-    res.writeHead(msg.statusCode, msg.statusMessage, msg.headers);
 
-    // if is a stream
-    if (msg.readable) {
-        msg.pipe(res);
+
+    if (this.inpectable) {
+        networkInspect.onResponse(this.req, {
+            statusCode: statusCode,
+            statusMessage: statusMessage,
+            headers: headers,
+            ext: ext
+        }, msg, function(stream, modifiedStream) {
+            write(stream, modifiedStream);
+        });
+    } else {
+        write(msg);
     }
 
-    if (this.inspect) {
-        this.inspect.response(msg);
+    function write(stream, modifiedStream) {
+        if (modifiedStream) {
+            // 如果修改了响应, contentlength就失效了, 改为chunked传输
+            if (utils.header(headers, 'content-length')) {
+                utils.deleteHeader(headers, 'content-length');
+                headers['transfer-encoding'] = 'chunked';
+            }
+        }
+
+        // write head
+        res.writeHead(statusCode, statusMessage, headers);
+
+        // if is a stream
+        if (stream && stream.readable) {
+            stream.pipe(res);
+        }
     }
 };
 

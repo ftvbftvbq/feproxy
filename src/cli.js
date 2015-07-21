@@ -40,8 +40,8 @@ cli.main = function( args, opts ) {
     // https proxy
     svr.on('connect', proxy.onConnect);
 
-    // inpect
-    svr.on('upgrade', require('./inspect/inspect').onUpgrade);
+    // inpect socket
+    svr.on('upgrade', require('./inspect').onUpgrade);
 
     svr.listen(config.port, function() {
         console.log('Proxy service on %s', config.port);

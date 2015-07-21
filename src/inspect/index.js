@@ -1,9 +1,7 @@
 var _ = require('underscore');
 var WebSocketServer = require('ws').Server
 var express = require('express');
-var Request = require('./request');
-var pool = require('./pool');
-var response = require('./response');
+var methods = require('./methods');
 
 var ws = null;
 var connects = [];
@@ -32,17 +30,17 @@ exports.onUpgrade = function(req, socket, upgradeHead) {
             if (!data || !data.method) {
                 return;
             }
-            response.method(conn, data);
+            methods.method(conn, data);
             if (data.method === 'Inspector.enable' && !connAttached) {
                 connAttached = true;
                 connects.push(conn);
-                response.notify(conn, 'Runtime.executionContextCreated');
+                methods.notify(conn, 'Runtime.executionContextCreated');
             }
         });
         conn.on('end', function() {
             for (var i = 0, len = connects.length; i < len; i++) {
                 if (connects[i] === conn) {
-                    connects.splice(i - 1, 1);
+                    connects.splice(i, 1);
                     i--;
                 }
             }
@@ -50,12 +48,7 @@ exports.onUpgrade = function(req, socket, upgradeHead) {
     });
 };
 
-exports.createInpectRequest = function(req) {
-    if (!ws || !connects.length) {
-        return null;
-    }
-    var request = new Request(connects, req);
-    pool.save(request);
-    return request;
+exports.getConnects = function() {
+    return ws && connects || [];
 };
 

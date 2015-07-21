@@ -1,4 +1,12 @@
+var zlib = require('zlib');
+var jschardet = require('jschardet');
+var iconv = require('iconv-lite');
 var _ = require('underscore');
+
+exports.deleteHeader = function(headers, name) {
+    headers[name] && delete headers[name];
+    headers[name.toLowerCase()] && delete headers[name.toLowerCase()];
+};
 
 exports.header = function(headers, name) {
     var v = [];

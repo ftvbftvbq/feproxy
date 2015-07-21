@@ -1,19 +1,7 @@
 var _ = require('underscore');
-var pool = require('./pool');
 var frame = require('./frame');
 
 var methods = {
-    'Network.getResponseBody': function(data) {
-        var poolItem = pool.get(data.params.requestId);
-        if(poolItem) {
-            return poolItem.getResponseBody();
-        } else {
-            return {
-                base64Encoded: false,
-                body: ''
-            };
-        }
-    },
     'Page.getResourceContent': function(data) {
         return {
             base64Encoded: false,
@@ -28,11 +16,6 @@ var methods = {
             }
         };
     },
-    'Network.enable': function() {
-        return {
-            result: true
-        };
-    },
     'default': function() {
         return {
             result: false
@@ -40,6 +23,11 @@ var methods = {
     }
 };
 
+_.extend(
+    methods, 
+    require('./network/methods').methods,
+    require('./console/methods').methods
+);
 
 var notifies = {
     "Runtime.executionContextCreated": function() {
@@ -54,6 +42,8 @@ var notifies = {
         }
     }
 };
+
+exports.methods = methods;
 
 exports.method = function(socket, data) {
     var method = data.method;
@@ -77,5 +67,4 @@ exports.notify = function(socket, method) {
         params: params
     }));
 };
-
 

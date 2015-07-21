@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.use(session({
-    secret: config.secret,
+    secret: 'XXXXXXAAAAAA',
     resave: false,
     saveUninitialized: false,
     cookie: {

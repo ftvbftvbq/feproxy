@@ -12,7 +12,6 @@ config.reload = function() {
         rc: (process.env.HOME || process.env.USERPROFILE) 
             + '/.anyproxyrc',
         port: 8080,
-        secret: 'XXXXaaa',
         projects: [],
         rule: [],
         host: [],

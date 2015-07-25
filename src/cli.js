@@ -15,7 +15,7 @@ var cli = {};
  *
  * @type {string}
  */
-cli.description = 'any proxy';
+cli.description = 'fe proxy';
 
 /**
  * 模块命令行运行入口
@@ -28,6 +28,7 @@ cli.main = function( args, opts ) {
     var proxy = require('./proxy/index');
 
     var svr = http.createServer(function(req, res) {
+        // 代理请求url包含http:// 非代理请求不包含
         if (/^http:\/\//i.test(req.url)) {
             // http proxy
             proxy.onHttp.apply(proxy, arguments);
@@ -43,6 +44,7 @@ cli.main = function( args, opts ) {
     // inpect socket
     svr.on('upgrade', require('./inspect').onUpgrade);
 
+    // listen
     svr.listen(config.port, function() {
         console.log('Proxy service on %s', config.port);
         console.log('Manage page on http://127.0.0.1:%s', config.port);

@@ -6,6 +6,9 @@ var methods = require('./methods');
 var ws = null;
 var connects = [];
 
+/**
+ * on upgrade
+ */
 exports.onUpgrade = function(req, socket, upgradeHead) {
     if (!ws) {
         ws = new WebSocketServer({
@@ -18,6 +21,7 @@ exports.onUpgrade = function(req, socket, upgradeHead) {
     upgradeHead.copy(head);
     upgradeHead = null;
 
+    // 使用websocket解析编码socket
     ws.handleUpgrade(req, socket, head, function(conn){
         var connAttached = false;
         conn.on('message', function(chunk) {
@@ -38,6 +42,7 @@ exports.onUpgrade = function(req, socket, upgradeHead) {
             }
         });
         conn.on('end', function() {
+            // 从连接池删除
             for (var i = 0, len = connects.length; i < len; i++) {
                 if (connects[i] === conn) {
                     connects.splice(i, 1);
@@ -48,6 +53,10 @@ exports.onUpgrade = function(req, socket, upgradeHead) {
     });
 };
 
+/**
+ * 获取当前的链接
+ * @return {Array<Socket>} 
+ */
 exports.getConnects = function() {
     return ws && connects || [];
 };

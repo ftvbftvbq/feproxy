@@ -3,6 +3,10 @@ var _ = require('underscore');
 var frame = require('../frame');
 var timestamp = require('../timestamp');
 
+/**
+ * @constructor
+ * @param {Array<Socket>} sockets
+ */
 var Request = function(sockets) {
     this.sockets = sockets;
     this.id = ++Request.id;
@@ -22,6 +26,12 @@ var proto = Request.prototype;
 
 proto.__proto__ = EventEmitter.prototype;
 
+/**
+ * @param {Object} request
+ *  {
+ *
+ *  }
+ */
 proto.onSend = function(request) {
     request = request || {};
     this.send('Network.requestWillBeSent', {
@@ -40,6 +50,12 @@ proto.onSend = function(request) {
     });
 };
 
+/**
+ * @param {Object} res
+ *  {
+ *
+ *  }
+ */
 proto.onResponse = function(res) {
     res = res || {};
     this.send('Network.responseReceived', {
@@ -88,14 +104,12 @@ proto.onData = function(data) {
 };
 
 proto.onFinish = function(data) {
-    this.send('Network.dataReceived', {
-        dataLength: data.dataLength - data.encodedDataLength,
-        encodedDataLength: 1
-    });
     this.send('Network.loadingFinished', {
         dataLength: data.dataLength,
         encodedDataLength: data.encodedDataLength
     });
+    // 清除sockets 释放内存
+    this.sockets = null;
 };
 
 proto.onError = function() {

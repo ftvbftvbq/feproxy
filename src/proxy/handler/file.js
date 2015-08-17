@@ -14,7 +14,7 @@ proto.get = function() {
     var me = this;
     var dist = me.dist;
     var req = me.req;
-    var path = dist.ext.replace(/^\/?/, '/');
+    var path = dist.ext.replace(/^\/?/, '/').replace(/\?.*$/, '');
     var response;
     if (path && fs.existsSync(path)) {
         var stats = fs.statSync(path);

@@ -74,9 +74,9 @@ config.reload = function() {
         ).toString();
         config.proxyPacFun = pac(text);
     }
-    //console.log(_.extend({}, config, {
-        //proxyPac: ''
-    //}));
+    console.log(_.extend({}, config, {
+        proxyPac: ''
+    }));
 };
 
 config.reload();

@@ -30,9 +30,11 @@ proto.inpectable = true;
 
 var statusCodeMap = {
     200: 'OK',
+    302: 'Moved Temporarily',
     404: 'Not Found',
     500: 'Internal Server Error',
-    501: 'Not Implemented'
+    501: 'Not Implemented',
+    unknown: 'Unknown'
 };
 
 /**
@@ -40,7 +42,8 @@ var statusCodeMap = {
  */
 proto.response = function(msg) {
     var statusCode = msg.statusCode || 200;
-    var statusMessage = msg.statusMessage || statusCodeMap[msg.statusCode];
+    var statusMessage = msg.statusMessage || statusCodeMap[msg.statusCode] 
+        || statusCodeMap.unknown;
     var headers = getResponseHeaders(msg.headers);
     var ext = getResponseExt(msg.headers);
 

@@ -11,7 +11,7 @@ config.reload = function() {
     var defaultConfig = {
         rc: (process.env.HOME || process.env.USERPROFILE) 
             + '/.anyproxyrc',
-        port: 8080,
+        port: 8100,
         projects: [],
         rule: [],
         host: [],

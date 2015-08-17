@@ -18,11 +18,11 @@ $ [sudo] npm install feproxy -g
 $ feproxy
 ```
 
-Proxy server on port: 8080
+Proxy server on port: 8100
 
-Inspect page on [http://127.0.0.1:8080/inspect](http://127.0.0.1:8080/inspect)
+Inspect page on [http://127.0.0.1:8100/inspect](http://127.0.0.1:8100/inspect)
 
-Manage page on [http://127.0.0.1:8080](http://127.0.0.1:8080)
+Manage page on [http://127.0.0.1:8100](http://127.0.0.1:8100)
 
 ### TODO
 

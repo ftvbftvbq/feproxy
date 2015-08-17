@@ -75,6 +75,8 @@ proto.response = function(msg) {
         // if is a stream
         if (stream && stream.readable) {
             stream.pipe(res);
+        } else {
+            res.end();
         }
     }
 };

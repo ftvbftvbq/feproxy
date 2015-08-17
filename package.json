@@ -1,6 +1,6 @@
 {
     "name": "feproxy",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "node_version": ">= 0.8.0",
     "author": {
         "name": "feixiang yuan"

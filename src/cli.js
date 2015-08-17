@@ -2,6 +2,9 @@ var http = require('http');
 var url = require('url');
 var config = require('./config');
 
+// set maxlistener
+require('events').EventEmitter.prototype._maxListeners = 30;
+
 /**
  * 命令行配置项
  *

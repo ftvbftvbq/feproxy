@@ -86,6 +86,7 @@ exports.onResponse = function(req, res, stream, cb) {
     var readable = stream && stream.readable;
     var isText = utils.isText(ext.mimeType); // 是否是文本
     var needInject = ext.mimeType.indexOf('html') !== -1; // 是否需要注入
+    needInject = false;
 
     if (!readable) {
         inspect.emit('finish', {

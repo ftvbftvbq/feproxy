@@ -15,19 +15,26 @@ proto.get = function() {
     var dist = me.dist;
     var path = dist.ext.replace(/^\/?/, '/').replace(/\?.*$/, '');
     var response;
-    if (path && fs.existsSync(path)) {
-        var stats = fs.statSync(path);
+    function error() {
+        response = {
+            statusCode: 404
+        };
+        me.emit('response', response);
+    }
+    if (!path) {
+        return error();
+    }
+    fs.stat(path, function(err, stats) {
+        if (err) {
+            return error();
+        }
         response = fs.createReadStream(path);
         response.headers = {
             'Content-Type': mime.lookup(path),
             'Content-Length': stats.size
         };
-    } else {
-        response = {
-            statusCode: 404
-        };
-    }
-    me.emit('response', response);
+        me.emit('response', response);
+    });
 };
 
 proto.__proto__ = AbstractHandler.prototype;

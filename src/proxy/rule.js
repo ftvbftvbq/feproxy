@@ -50,7 +50,7 @@ exports.apply = function(req, cb) {
             if (hrefInfo.hostname === item.host) {
                 var tmp = item.ip.split(/:/);
                 dist.hostname = tmp[0];
-                dist.port = +tmp[1] || 80;
+                dist.port = +tmp[1] || hrefInfo.port || 80;
             }
         });
     }

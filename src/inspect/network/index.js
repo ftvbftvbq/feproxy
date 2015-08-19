@@ -3,6 +3,7 @@ var zlib = require('zlib');
 var jschardet = require('jschardet');
 var iconv = require('iconv-lite');
 var utils = require('../../utils');
+var url = require('../../url');
 var inspectMain = require('../index');
 var Request = require('./request');
 var pool = require('./pool');
@@ -86,7 +87,6 @@ exports.onResponse = function(req, res, stream, cb) {
     var readable = stream && stream.readable;
     var isText = utils.isText(ext.mimeType); // 是否是文本
     var needInject = ext.mimeType.indexOf('html') !== -1; // 是否需要注入
-    needInject = false;
 
     if (!readable) {
         inspect.emit('finish', {
@@ -205,6 +205,17 @@ exports.onResponse = function(req, res, stream, cb) {
     }
 };
 
+function getInject() {
+    var cfg = {
+        url: url()
+    };
+    return [
+        '<script>var $$feproxy=' + JSON.stringify(cfg) + ';</script>',
+        '<script src="' + url('devtools/client.js') + '"></script>',
+        '$1'
+    ].join('');
+}
+
 function injectStream(stream, ext) {
     var newStream = new Transform({
         writeableObjectMode: true,
@@ -216,7 +227,7 @@ function injectStream(stream, ext) {
         if (!injected && chunk) {
             chunk = chunk.replace(
                 /(<script)/, 
-                '<script src="http://127.0.0.1:8080/devtools/client.js"></script>$1'
+                getInject()
             );
             injected = true;
         }

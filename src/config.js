@@ -14,7 +14,13 @@ config.reload = function() {
         port: 8100,
         projects: [],
         rule: [],
-        host: [],
+        host: [
+            // 永久host
+            {
+                host: 'feproxy.com',
+                ip: '127.0.0.1'
+            }
+        ],
         advance: [],
         proxyType: '',
         proxyPac: '',

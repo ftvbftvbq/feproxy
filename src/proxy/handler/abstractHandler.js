@@ -11,12 +11,12 @@ function AbstractHandler(req, res) {
     this.listenError(this.req.socket);
     this.listenError(this.res);
     this.on('response', this.response.bind(this));
-    // 如果是post get方法中应立刻读取body 
-    this.get();
     // chrome inspect
     if (this.inpectable !== false) {
         networkInspect.onSend(req);
     }
+    // 如果是post get方法中应立刻读取body 
+    this.get();
 }
 
 var proto = AbstractHandler.prototype;
@@ -42,13 +42,13 @@ var statusCodeMap = {
  */
 proto.response = function(msg) {
     var statusCode = msg.statusCode || 200;
-    var statusMessage = msg.statusMessage || statusCodeMap[msg.statusCode] 
+    var statusMessage = msg.statusMessage 
+        || statusCodeMap[statusCode] 
         || statusCodeMap.unknown;
     var headers = getResponseHeaders(msg.headers);
     var ext = getResponseExt(msg.headers);
 
     var res = this.res;
-
 
     if (this.inpectable) {
         networkInspect.onResponse(this.req, {

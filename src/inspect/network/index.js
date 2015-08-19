@@ -73,10 +73,10 @@ exports.onResponse = function(req, res, stream, cb) {
         url: req.url,
         status: res.statusCode,
         statusText: res.statusMessage,
-        headers: res.headers,
+        headers: utils.wrapHeaders(res.headers),
         headersText: utils.headersText(res.headers),
         mimeType: utils.headerContentType(res.headers).mimeType,
-        requestHeaders: req.headers,
+        requestHeaders: utils.wrapHeaders(req.headers),
         requestHeadersText: utils.headersText(req.headers),
         remoteIPAddress: req.dist.hostname,
         remotePort: req.dist.port

@@ -18,10 +18,24 @@ exports.header = function(headers, name) {
     return !v.length ? '' : (v.length === 1 ? v[0] : v.join(' '));
 };
 
+exports.wrapHeaders = function(headers) {
+    var rt = {};
+    for (var k in headers) {
+        var item = headers[k];
+        rt[k] = _.isArray(item) ? item.join('\n') : item + '';
+    }
+    return rt;
+};
+
 exports.headersText = function(headers) {
-    return _.map(headers, function(k, v) {
-        return k + ': ' + v;
-    }).join('\r\n')
+    var list = [];
+    _.each(headers, function(item, k) {
+        item = _.isArray(item) ? item : [item];
+        item.forEach(function(str) {
+            list.push(k + ': ' + str);
+        });
+    });
+    return list.join('\r\n');
 };
 
 exports.headerContentType = function(headers) {

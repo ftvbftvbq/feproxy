@@ -34,6 +34,7 @@ config.reload = function() {
         } catch (ex) {
             console.log(ex);
         }
+        console.log('parse config from: ' + defaultConfig.rc);
     }
 
     _.extend(config, defaultConfig, rc, {
@@ -80,9 +81,6 @@ config.reload = function() {
         ).toString();
         config.proxyPacFun = pac(text);
     }
-    console.log(_.extend({}, config, {
-        proxyPac: ''
-    }));
 };
 
 config.reload();

@@ -213,7 +213,7 @@ function getInject() {
         '<script>var $$feproxy=' + JSON.stringify(cfg) + ';</script>',
         '<script src="' + url('devtools/client.js') + '"></script>',
         '$1'
-    ].join('');
+    ].join('\n');
 }
 
 function injectStream(stream, ext) {

@@ -5,5 +5,4 @@
         var img = new Image();
         img.src = $feproxy.url + 'consolelog?obj=' + JSON.stringify(obj);
     };
-    
 })();

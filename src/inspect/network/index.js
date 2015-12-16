@@ -175,7 +175,7 @@ function progress(inspect) {
 }
 
 function unzip(ext) {
-    if (!ext.contentEncoding) {
+    if (ext.contentEncoding) {
         switch (ext.contentEncoding) {
             case 'gzip':
                 return zlib.createGunzip();

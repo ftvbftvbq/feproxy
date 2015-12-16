@@ -10,7 +10,7 @@ pool._data = {};
 pool._dataList = [];
 
 // 最大数目
-pool.maxLen = 100;
+pool.maxLen = 500;
 
 /**
  * get pool item

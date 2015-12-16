@@ -1,4 +1,4 @@
-var Transform = require('stream').Transform;
+var stream = require('stream');
 var zlib = require('zlib');
 var jschardet = require('jschardet');
 var iconv = require('iconv-lite');
@@ -64,12 +64,13 @@ exports.onSend = function(req) {
 /**
  * response
  */
-exports.onResponse = function(req, res, stream, cb) {
+exports.onResponse = function(req, res, s, cb) {
     if (!req._inspect) {
-        return cb(stream);
+        return cb(s);
     }
 
     var inspect = req._inspect;
+
     inspect.emit('response', {
         url: req.url,
         status: res.statusCode,
@@ -83,158 +84,203 @@ exports.onResponse = function(req, res, stream, cb) {
         remotePort: req.dist.port
     });
 
-    var ext = res.ext;
-    var readable = stream && stream.readable;
-    var isText = utils.isText(ext.mimeType); // 是否是文本
-    var needInject = ext.mimeType.indexOf('html') !== -1; // 是否需要注入
+    var ext = res.ext,
+        readable = s && s.readable,
+        isText = utils.isText(ext.mimeType), // 是否是文本
+        needInject = ext.mimeType.indexOf('html') !== -1; // 是否需要注入
 
     if (!readable) {
+        cb(s);
         inspect.emit('finish', {
             dataLength: 0,
             encodedDataLength: 0
         });
-        return cb(stream);
+        return;
     }
 
-    var unzipChunk = new Buffer(0);
-    var charset;
-    var rawLength = 0; // raw length
+    // TODO open it
+    needInject = false;
 
-    if (!needInject) {
-        // 如果不需注入, 不需要修改stream, 立刻回调
-        // 但不return 下面还需要inpect
-        cb(stream);
-    }
-
-    stream.on('data', function(chunk) {
-        rawLength += chunk.length;
-    });
-
-    // unzip ...
-    switch (ext.contentEncoding) {
-        case 'gzip':
-            stream = stream.pipe(zlib.createGunzip());
-            break;
-        case 'deflate':
-            stream = stream.pipe(zlib.createInflate());
-            break;
-    }
-
-    // collect chunk & data event
-    stream.on('data', function(chunk) {
-        if (!unzipChunk || unzipChunk.length + chunk.length > MAX_RESPONSE) {
-            unzipChunk = null;
-        } else {
-            unzipChunk = Buffer.concat([unzipChunk, chunk]);
-        }
-        inspect.emit('data', {
-            dataLength: chunk.length
-        });
-    });
-
-    if (isText) {
-        // decode stream
-        stream.once('data', function(chunk) {
-            // 获取编码
-            charset = ext.charset || jschardet.detect(chunk).encoding 
-                || 'utf-8';
-            var iconvStream = iconv.decodeStream(charset);
-            iconvStream.write(chunk);
-            stream.pipe(iconvStream);
-            stream = iconvStream;
-            charsetNext();
-        });
+    if (needInject) {
+        onResponseTextInject(req, res, s, cb);
+    } else if (isText) {
+        onResponseText(req, res, s, cb);
     } else {
-        charsetNext();
-    }
-    
-    function charsetNext() {
-        // 注入
-        if (needInject) {
-            stream = injectStream(stream, ext);
-        }
-
-        // collect text
-        var responseText = '';
-        if (isText) {
-            stream.on('data', function(text) {
-                if (responseText !== null) {
-                    responseText += text;
-                }
-                if (responseText.length > MAX_RESPONSE) {
-                    responseText = null;
-                }
-            });
-        }
-        // 注入后重新编码
-        if (needInject) {
-            // encode
-            stream = stream.pipe(iconv.encodeStream(charset));
-
-            // zip
-            switch (ext.contentEncoding) {
-                case 'gzip':
-                    stream = stream.pipe(zlib.createGzip());
-                    break;
-                case 'deflate':
-                    stream = stream.pipe(zlib.createDeflate());
-                    break;
-            }
-        }
-
-        // end finish
-        stream.on('end', function() {
-            var responseBody = {};
-            if (isText) {
-                responseBody.base64 = false;
-                responseBody.body = responseText;
-            } else {
-                responseBody.base64 = true;
-                responseBody.body = unzipChunk.toString('base64');
-            }
-            inspect.setResponseBody(responseBody);
-            inspect.emit('finish', {
-                encodedDataLength: rawLength
-            });
-        });
-
-        if (needInject) {
-            // 剩余的回调
-            cb(stream, true);
-        }
+        onResponseBinary(req, res, s, cb);
     }
 };
 
-function getInject() {
-    var cfg = {
-        url: url()
-    };
-    return [
-        '<script>var $$feproxy=' + JSON.stringify(cfg) + ';</script>',
-        '<script src="' + url('devtools/client.js') + '"></script>',
-        '$1'
-    ].join('\n');
+function onResponseText(req, res, s, cb) {
+    cb(s);
+    s.pipe(rawLen(req._inspect))
+        .pipe(unzip(res.ext))
+        .pipe(progress(req._inspect))
+        .pipe(charset(res.ext))
+        .once('charset', function(charset) {
+            this.pipe(iconv.decodeStream(charset))
+                .pipe(responseBodyText(req._inspect))
+                .pipe(passWrite())
+        });
 }
 
-function injectStream(stream, ext) {
-    var newStream = new Transform({
-        writeableObjectMode: true,
-        readableObjectMode: true,
-        decodeStrings: false
-    });
-    var injected = false;
-    newStream._transform = function(chunk, charset, done) {
-        if (!injected && chunk) {
-            chunk = chunk.replace(
-                /(<script)/, 
-                getInject()
-            );
-            injected = true;
+function onResponseTextInject(req, res, s, cb) {
+    s.pipe(rawLen(req._inspect))
+        .pipe(unzip(res.ext))
+        .pipe(progress(req._inspect))
+        .pipe(charset(res.ext))
+        .once('charset', function(charset) {
+            var modified = this.pipe(iconv.decodeStream(charset))
+                .pipe(inject())
+                .pipe(responseBodyText(req._inspect))
+                .pipe(iconv.encodeStream(charset));
+            // 不再zip等
+            utils.deleteHeader(res.headers, 'content-encoding');
+            res.ext.contentEncoding = '';
+            cb(modified, true);
+        });
+}
+
+function onResponseBinary(req, res, s, cb) {
+    cb(s);
+    s.pipe(rawLen(req._inspect))
+        .pipe(unzip(res.ext))
+        .pipe(progress(req._inspect))
+        .pipe(responseBody(req._inspect))
+        .pipe(passWrite())
+}
+
+function rawLen(inspect) {
+    var len = 0;
+    return new stream.Transform({
+        transform: function(chunk, encoding, done) {
+            len += chunk.length;
+            done(null, chunk);
+        },
+        flush: function(done) {
+            inspect.encodedDataLength = len;
+            done();
         }
-        this.push(chunk, charset);
-        done(null);
-    };
-    stream.pipe(newStream);
-    return newStream;
-};
+    });
+}
+
+function progress(inspect) {
+    return new stream.Transform({
+        transform: function(chunk, encoding, done) {
+            inspect.emit('data', {
+                dataLength: chunk.length
+            });
+            done(null, chunk);
+        }
+    });
+}
+
+function unzip(ext) {
+    if (!ext.contentEncoding) {
+        switch (ext.contentEncoding) {
+            case 'gzip':
+                return zlib.createGunzip();
+            case 'deflate':
+                return zlib.createInflate()
+            default:
+                throw new Error('unsupported content-encoding: ' + ext.contentEncoding);
+        }
+    } else {
+        return new stream.PassThrough();
+    }
+}
+
+function charset(ext) {
+    var charset = null;
+    return new stream.Transform({
+        transform: function(chunk, encoding, done) {
+            if (!charset) {
+                charset = ext.charset || jschardet.detect(chunk).encoding 
+                    || 'utf-8';
+                this.emit('charset', charset);
+            }
+            done(null, chunk);
+        }
+    });
+}
+
+function responseBody(inspect) {
+    var buff = new Buffer(0);
+    return new stream.Transform({
+        transform: function(chunk, encoding, done) {
+            if (buff) {
+                buff = Buffer.concat([buff, chunk]);
+                if (buff.length > MAX_RESPONSE) {
+                    buff = null;
+                }
+            }
+            done(null, chunk);
+        },
+        flush: function(done) {
+            inspect.emit('finish', {
+                encodedDataLength: inspect.encodedDataLength
+            });
+            inspect.setResponseBody({
+                base64: true,
+                body: buff.toString('base64')
+            });
+            done();
+        }
+    });
+}
+
+function responseBodyText(inspect) {
+    var str = '';
+    return new stream.Transform({
+        objectMode: true,
+        transform: function(chunk, encoding, done) {
+            if (str !== null) {
+                str += chunk;
+                if (str.length > MAX_RESPONSE) {
+                    str = null;
+                }
+            }
+            done(null, chunk);
+        },
+        flush: function(done) {
+            inspect.emit('finish', {
+                encodedDataLength: inspect.encodedDataLength
+            });
+            inspect.setResponseBody({
+                base64: false,
+                body: str
+            });
+            done();
+        }
+    });
+}
+
+function passWrite() {
+    return new stream.PassThrough({
+            objectMode: true
+        })
+        .on('data', new Function())
+        .on('end', new Function());
+}
+
+function inject() {
+    var injected = false,
+        cfg = {
+            url: url()
+        },
+        str = '<script>var $$feproxy=' + JSON.stringify(cfg) + ';</script>\n'
+            + '<script src="' + url('devtools/client.js') + '"></script>';
+    return new stream.Transform({
+        objectMode: true,
+        transform: function(chunk, encoding, done) {
+            if (!injected && chunk) {
+                chunk = chunk.replace(
+                    /(<script)/, 
+                    str + '\n$1'
+                );
+                injected = true;
+            }
+            done(null, chunk);
+        }
+    });
+}
 

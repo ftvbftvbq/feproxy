@@ -56,15 +56,15 @@ proto.response = function(msg) {
             statusMessage: statusMessage,
             headers: headers,
             ext: ext
-        }, msg, function(stream, modifiedStream) {
-            write(stream, modifiedStream);
+        }, msg, function(stream, hasModified) {
+            write(stream, hasModified);
         });
     } else {
         write(msg);
     }
 
-    function write(stream, modifiedStream) {
-        if (modifiedStream) {
+    function write(stream, hasModified) {
+        if (hasModified) {
             // 如果修改了响应, contentlength就失效了, 改为chunked传输
             if (utils.header(headers, 'content-length')) {
                 utils.deleteHeader(headers, 'content-length');

@@ -8,7 +8,7 @@ var timestamp = require('../timestamp');
  * @param {Array<Socket>} sockets
  */
 var Request = function(sockets) {
-    this.sockets = sockets;
+    this.sockets = sockets || [];
     this.id = ++Request.id;
     this.frameId = frame.id;
     this.loaderId = frame.loaderId;

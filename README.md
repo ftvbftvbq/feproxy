@@ -1,21 +1,23 @@
-FeProxy
-=====
 
 ### Desc
 
-FeProxy is a proxy tool use for web development
-
-- Map url to file, other url, other host
+FeProxy is a proxy tool use for web development like the `Fiddler`, and we use `Chrome Devtools` to inpect net traffic.
 
 - Inpect net traffic to chrome
 
-### 安装
+[![inspect page](https://raw.githubusercontent.com/feix760/feproxy/master/docs/inspector.png)](http://127.0.0.1:8100/inspect)
+
+- Map url to file, other url, other host
+
+[![manage page](https://raw.githubusercontent.com/feix760/feproxy/master/docs/manage.png)](http://127.0.0.1:8100/inspect)
+
+### Install
 
 ```
 $ [sudo] npm install feproxy -g
 ```
 
-### 使用
+### Usage
 
 ```
 $ feproxy
@@ -27,7 +29,7 @@ Inspect page on [http://127.0.0.1:8100/inspect](http://127.0.0.1:8100/inspect)
 
 Manage page on [http://127.0.0.1:8100](http://127.0.0.1:8100)
 
-#### 配置
+### Manage
 
 `Rule`:
 
@@ -41,9 +43,9 @@ offline\\.zip status://404
 
 `Advance`:
 
-^http://qqweb\\.qq\\.com/cgi-bin/.*$ 10.70.65.10 
+^http://qqweb\\.qq\\.com/cgi-bin/.*$  10.70.65.10 
 
 ### TODO
 
-导入/导出 fiddler抓包saz文件
+export & import fiddler's *.saz file
 

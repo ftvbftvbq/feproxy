@@ -31,7 +31,7 @@ exports.apply = function(req, cb) {
         }
     });
 
-    if (!dist.href) {
+    if (!dist.href && !dist.hostname) {
         // rule
         config.rule.forEach(function(item) {
             var match = hrefInfo.href.match(item.match);
@@ -44,7 +44,7 @@ exports.apply = function(req, cb) {
         });
     }
 
-    if (!dist.hostname) {
+    if (!dist.href && !dist.hostname) {
         // host
         config.host.forEach(function(item) {
             if (hrefInfo.hostname === item.host) {
@@ -56,6 +56,7 @@ exports.apply = function(req, cb) {
     }
 
     dist.href = dist.href || hrefInfo.href;
+    dist.hrefHost = url.parse(dist.href).hostname;
     var match = dist.href.match(/^(\w*:)\/\/(.*)/);
     dist.protocol = match ? match[1].toLowerCase() : '';
     dist.ext = match ? match[2] : null;

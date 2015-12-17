@@ -39,7 +39,7 @@ function getHeaders(req, dist) {
     });
     
     headers.Connection = 'close';
-    headers.Host = dist.hostname;
+    headers.Host = dist.hrefHost;
     return headers;
 }
 

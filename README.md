@@ -14,13 +14,13 @@ FeProxy is a proxy tool use for web development like the `Fiddler`, and we use `
 ### Install
 
 ```sh
-$ [sudo] npm install feproxy -g
+[sudo] npm install feproxy -g
 ```
 
 ### Usage
 
 ```sh
-$ feproxy
+feproxy
 ```
 
 or 

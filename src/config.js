@@ -7,25 +7,25 @@ var utils = require('./utils');
 
 var config = {};
 
+var defaultConfig = {
+    rc: (process.env.HOME || process.env.USERPROFILE) + '/.feproxyrc',
+    port: 8100,
+    projects: [],
+    rule: [],
+    host: [
+        // 永久host
+        {
+            host: 'feproxy.com',
+            ip: '127.0.0.1'
+        }
+    ],
+    advance: [],
+    proxyType: '',
+    proxyPac: '',
+    proxyPacFun: null
+};
+
 config.reload = function() {
-    var defaultConfig = {
-        rc: (process.env.HOME || process.env.USERPROFILE) 
-            + '/.anyproxyrc',
-        port: 8100,
-        projects: [],
-        rule: [],
-        host: [
-            // 永久host
-            {
-                host: 'feproxy.com',
-                ip: '127.0.0.1'
-            }
-        ],
-        advance: [],
-        proxyType: '',
-        proxyPac: '',
-        proxyPacFun: null
-    };
 
     var rc = {};
     if (fs.existsSync(defaultConfig.rc)) {

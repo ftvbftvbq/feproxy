@@ -20,7 +20,7 @@ exports.apply = function(req, cb) {
             if (item.target) {
                 dist.href = item.target.replace(/\$(\d+)/g, function(text) {
                     var i = +RegExp.$1;
-                    return match[i] !== undefined ? match[1] : text;
+                    return match[i] !== undefined ? match[i] : text;
                 });
             }
             if (item.ip) {
@@ -38,7 +38,7 @@ exports.apply = function(req, cb) {
             if (match) {
                 dist.href = item.target.replace(/\$(\d+)/g, function(text) {
                     var i = +RegExp.$1;
-                    return match[i] !== undefined ? match[1] : text;
+                    return match[i] !== undefined ? match[i] : text;
                 });
             }
         });

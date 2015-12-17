@@ -13,17 +13,25 @@ FeProxy is a proxy tool use for web development like the `Fiddler`, and we use `
 
 ### Install
 
-```
+```sh
 $ [sudo] npm install feproxy -g
 ```
 
 ### Usage
 
-```
+```sh
 $ feproxy
 ```
 
-Proxy server on port: 8100
+or 
+
+```sh
+git clone https://github.com/feix760/feproxy.git
+cd feproxy
+node src/index.js
+```
+
+Proxy server on 127.0.0.1:8100
 
 Inspect page on [http://127.0.0.1:8100/inspect](http://127.0.0.1:8100/inspect)
 

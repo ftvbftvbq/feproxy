@@ -176,13 +176,14 @@ function progress(inspect) {
 
 function unzip(ext) {
     if (ext.contentEncoding) {
-        switch (ext.contentEncoding) {
-            case 'gzip':
-                return zlib.createGunzip();
-            case 'deflate':
-                return zlib.createInflate()
-            default:
-                throw new Error('unsupported content-encoding: ' + ext.contentEncoding);
+        if (ext.contentEncoding.indexOf('gzip') !== -1) {
+            return zlib.createGunzip();
+        } else if (ext.contentEncoding.indexOf('deflate') !== -1) {
+            return zlib.createInflate()
+        } else {
+            var msg = 'unsupported content-encoding: ' + ext.contentEncoding;
+            console.log(msg);
+            return passMessage(msg);
         }
     } else {
         return new stream.PassThrough();
@@ -249,6 +250,18 @@ function responseBodyText(inspect) {
                 base64: false,
                 body: str
             });
+            done();
+        }
+    });
+}
+
+function passMessage(str) {
+    return new stream.Transform({
+        transform: function(chunk, encoding, done) {
+            done(null, new Buffer(0));
+        },
+        flush: function(done) {
+            this.push(str || '');
             done();
         }
     });

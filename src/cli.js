@@ -51,7 +51,7 @@ cli.main = function( args, opts ) {
     svr.listen(config.port, function() {
         console.log('Proxy service on %s', config.port);
         console.log('Manage page on http://127.0.0.1:%s', config.port);
-        console.log('Inpect page on http://127.0.0.1:%s/inpect', config.port);
+        console.log('Inpect page on http://127.0.0.1:%s/inspect', config.port);
     });
 };
 

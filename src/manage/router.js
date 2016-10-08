@@ -4,13 +4,7 @@ var config = require('../config');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-    console.log('root');
     res.redirect('index');
-});
-
-router.get('/consolelog', function(req, res, next) {
-    console.log(req.query.obj);
-    res.end();
 });
 
 router.get('/index', function(req, res, next) {
@@ -44,3 +38,4 @@ router.post('/save', function(req, res, next) {
 });
 
 module.exports = router;
+
